@@ -1,15 +1,22 @@
 from flask import Flask, jsonify
-from classes import User
+from services.UserService import UserService
+from repositories.UserRepository import UserRepository
+
+
+
+userRepository = UserRepository()
+userService = UserService(userRepository)
+
 
 app = Flask(__name__)
 
-u1 = User.User("karol", 10)
+
 
 @app.route('/')
 def index():
+    userService.getUser()
+    return "Works"
 
-    data = u1.getAllUsers()
-    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(debug=True)
