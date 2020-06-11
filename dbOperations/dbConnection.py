@@ -1,19 +1,16 @@
 import psycopg2
-from dbOperations.dbConfig import config
+from psycopg2 import pool
 
 
 def connect():
-    """ Connect to the PostgreSQL database server """
-    conn = None
     try:
-        # read connection parameters
-        params = config()
-
-        # connect to the PostgreSQL server
-        conn = psycopg2.connect(**params)
-
+        conn = psycopg2.pool.SimpleConnectionPool(2, 10, user="postgres",
+                                                  password="mysecretpassword",
+                                                  host="127.0.0.1",
+                                                  port="5432",
+                                                  database="postgres")
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            return conn
+        print("Error while connecting to PostgreSQL", error)
+
+    else:
+        return conn
