@@ -4,7 +4,7 @@ from psycopg2 import pool
 
 def connect():
     try:
-        conn = psycopg2.pool.SimpleConnectionPool(2, 10, user="postgres",
+        conn = psycopg2.pool.SimpleConnectionPool(2, 50, user="postgres",
                                                   password="mysecretpassword",
                                                   host="127.0.0.1",
                                                   port="5432",

@@ -1,4 +1,4 @@
-from domain.User import User
+
 
 class UserService:
     def __init__(self, userRepository):
@@ -19,8 +19,8 @@ class UserService:
         userEntity = self.userRepository.delete(data)
         return userEntity
 
-    def updateUser(self, _id, data):
-        userEntity = self.userRepository.update(_id, data)
+    def updateUser(self, data):
+        userEntity = self.userRepository.update(data)
         return userEntity
 
 
