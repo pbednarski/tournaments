@@ -1,13 +1,11 @@
 from dbOperations.dbConnection import connect
-from classes.User import User
-from psycopg2 import ProgrammingError, OperationalError, errorcodes, errors
+from domain.User import User
 
 class UserRepository:
     def __init__(self):
         pass
 
-    @staticmethod
-    def load(data):
+    def loadOne(data):
         connection = connect().getconn()
         cur = connection.cursor()
         cur.execute("""Select id, name, password, access from USERS WHERE id = %(id)s""",
@@ -19,7 +17,19 @@ class UserRepository:
         else:
             return None
 
-    @staticmethod
+    def loadAll(self):
+        connection = connect().getconn()
+        cur = connection.cursor()
+        cur.execute("""Select id, name, password, access from USERS""")
+        users = cur.fetchall()
+        cur.close()
+        usersList = []
+
+        for item in users:
+            usersList.append(User(item[1], item[2], item[3], item[0]).__dict__)
+
+        return usersList
+
     def save(data):
         connection = connect().getconn()
         cur = connection.cursor()
@@ -28,7 +38,19 @@ class UserRepository:
         cur.close()
         connection.commit()
 
-    @staticmethod
+    def update(_id, data):
+        connection = connect().getconn()
+        cur = connection.cursor()
+        cur.execute("""with a as (UPDATE USERS SET name = %(name)s, name = %(password)s, name = %(access)s 
+        WHERE id = %(id)s returning 1) select count(*) from a""", data)
+        count = cur.fetchone()
+        cur.close()
+        connection.commit()
+        if count[0] == 1:
+            return data
+        else:
+            return {"Message": "Unable to update user"}
+
     def delete(data):
         connection = connect().getconn()
         cur = connection.cursor()
