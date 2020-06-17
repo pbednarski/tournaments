@@ -4,11 +4,11 @@ from psycopg2 import pool
 
 def connectionPool():
     try:
-        conn = psycopg2.pool.SimpleConnectionPool(2, 50, user="process.env.DATABASE_USER",
-                                                  password="process.env.DATABASE_PASS",
-                                                  host="process.env.DATABASE_HOST",
+        conn = psycopg2.pool.SimpleConnectionPool(2, 50, user="postgres",
+                                                  password="mysecretpassword",
+                                                  host="127.0.0.1",
                                                   port="5432",
-                                                  database="process.env.DATABASE_DATA")
+                                                  database="postgres")
     except (Exception, psycopg2.DatabaseError) as error:
         print("Error while connecting to PostgreSQL", error)
 
