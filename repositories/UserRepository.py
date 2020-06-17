@@ -42,7 +42,7 @@ class UserRepository:
         try:
             cur.execute("""INSERT INTO USERS (name, password, access) VALUES (%(name)s, %(password)s, %(access)s)""",
                         data)
-        except (Exception, DatabaseError) as error:
+        except DatabaseError:
             cur.close()
             self.dbConnectionPool.putconn(connection)
             return None

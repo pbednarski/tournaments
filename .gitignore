@@ -239,3 +239,4 @@ fabric.properties
 
 http-client.env.json
 requests.http
+*.log
