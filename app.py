@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, abort
 from services import UserService, PlayerService, TournamentService
 from repositories import UserRepository, PlayerRepository, TournamentRepository
 from dbOperations import dbConnection
+import os
 
 dbConnectionPool = dbConnection.connectionPool()
 
@@ -15,6 +16,8 @@ tournamentRepository = TournamentRepository.TournamentRepository(dbConnectionPoo
 tournamentService = TournamentService.TournamentService(tournamentRepository)
 
 app = Flask(__name__)
+
+port = int(os.environ.get("PORT", 5000))
 
 
 @app.route('/user/', methods=['POST', 'GET'])
@@ -159,6 +162,6 @@ def tournamentByIdEndpoint(_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)
 
 dbConnectionPool.closeall()
