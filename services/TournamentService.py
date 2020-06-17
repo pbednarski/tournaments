@@ -11,12 +11,13 @@ class TournamentService:
         return tournamentsList
 
     def addTournament(self, data):
-        self.tournamentRepository.save(data)
+        tournamentEntity = self.tournamentRepository.save(data)
+        return tournamentEntity
 
     def deleteTournament(self, _id):
         tournamentEntity = self.tournamentRepository.delete(_id)
         return tournamentEntity
 
-    def updateTournamen(self, _id):
-        tournamentEntity = self.tournamentRepository.update(_id)
+    def updateTournamen(self, data):
+        tournamentEntity = self.tournamentRepository.update(data)
         return tournamentEntity

@@ -11,12 +11,13 @@ class PlayerService:
         return usersList
 
     def addPlayer(self, data):
-        self.userRepository.save(data)
+        userEntity = self.userRepository.save(data)
+        return userEntity
 
     def deletePlayer(self, _id):
         userEntity = self.userRepository.delete(_id)
         return userEntity
 
-    def updatePlayer(self, _id):
-        userEntity = self.userRepository.update(_id)
+    def updatePlayer(self, data):
+        userEntity = self.userRepository.update(data)
         return userEntity

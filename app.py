@@ -20,92 +20,114 @@ app = Flask(__name__)
 @app.route('/user/', methods=['POST', 'GET'])
 def userEndpoint():
     if request.method == 'POST':
-        answer = userService.addUser(request.json)
+        _answer = userService.addUser(request.json)
 
-        if answer is None:
+        if _answer is None:
             return abort(404)
         else:
-            return jsonify(answer)
-
+            return jsonify(_answer)
 
     elif request.method == 'GET':
-        return jsonify(userService.getAllUsers())
+        _answer = userService.getAllUsers()
+
+        if _answer is None:
+            return abort(404)
+        else:
+            return jsonify(_answer)
 
 
 @app.route('/user/<int:_id>', methods=['GET', 'DELETE', 'PUT'])
 def userByIdEndpoint(_id):
     if request.method == 'GET':
-        answer = userService.getUser({"id": _id})
+        _answer = userService.getUser({"id": _id})
 
-        if answer is None:
+        if _answer is None:
             return abort(404)
         else:
-            return jsonify(answer)
+            return jsonify(_answer)
 
     elif request.method == 'DELETE':
-        answer = userService.deleteUser({"id": _id})
+        _answer = userService.deleteUser({"id": _id})
 
-        if answer is None:
+        if _answer is None:
             return abort(404)
         else:
-            return answer
+            return _answer
 
     elif request.method == 'PUT':
         data = dict({"id": _id}, **request.json)
-        answer = userService.updateUser(data)
+        _answer = userService.updateUser(data)
 
-        if answer is None:
+        if _answer is None:
             return abort(404)
         else:
-            return answer
+            return _answer
 
 
 @app.route('/player/', methods=['POST', 'GET'])
 def playerEndpoint():
-
     if request.method == 'POST':
-        playerService.addPlayer(request.json)
-        return request.json
+        _answer = playerService.addPlayer(request.json)
+
+        if _answer is None:
+            return abort(404)
+        else:
+            return jsonify(_answer)
 
     elif request.method == 'GET':
-        return jsonify(playerService.getAllPlayers())
+        _answer = playerService.getAllPlayers()
+
+        if _answer is None:
+            return abort(404)
+        else:
+            return jsonify(_answer)
+
 
 @app.route('/player/<int:_id>', methods=['GET', 'DELETE', 'PUT'])
 def playerByIdEndpoint(_id):
     if request.method == 'GET':
-        answer = playerService.getPlayer({"id": _id})
+        _answer = playerService.getPlayer({"id": _id})
 
-        if answer is None:
+        if _answer is None:
             return abort(404)
         else:
-            return jsonify(answer)
+            return jsonify(_answer)
 
     elif request.method == 'DELETE':
-        answer = playerService.deletePlayer({"id": _id})
+        _answer = playerService.deletePlayer({"id": _id})
 
-        if answer is None:
+        if _answer is None:
             return abort(404)
         else:
-            return answer
+            return jsonify(_answer)
 
     elif request.method == 'PUT':
         data = dict({"id": _id}, **request.json)
-        answer = playerService.updatePlayer(data)
+        _answer = playerService.updatePlayer(data)
 
-        if answer is None:
+        if _answer is None:
             return abort(404)
         else:
-            return answer
+            return jsonify(_answer)
 
 
 @app.route('/tournament/', methods=['POST', 'GET'])
 def tournamentEndpoint():
     if request.method == 'POST':
-        tournamentService.addTournament(request.json)
-        return request.json
+        _answer = tournamentService.addTournament(request.json)
+
+        if _answer is None:
+            return abort(404)
+        else:
+            return jsonify(_answer)
 
     elif request.method == 'GET':
-        return jsonify(tournamentService.getAllTournaments())
+        _answer = tournamentService.getAllTournaments()
+
+        if _answer is None:
+            return abort(404)
+        else:
+            return jsonify(_answer)
 
 
 @app.route('/tournament/<int:_id>', methods=['GET', 'DELETE', 'PUT'])
@@ -117,6 +139,23 @@ def tournamentByIdEndpoint(_id):
             return abort(404)
         else:
             return jsonify(answer)
+
+    elif request.method == 'DELETE':
+        answer = tournamentService.deleteTournament({"id": _id})
+
+        if answer is None:
+            return abort(404)
+        else:
+            return answer
+
+    elif request.method == 'PUT':
+        data = dict({"id": _id}, **request.json)
+        answer = tournamentService.updateTournamen(data)
+
+        if answer is None:
+            return abort(404)
+        else:
+            return answer
 
 
 if __name__ == '__main__':
