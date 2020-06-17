@@ -1,16 +1,19 @@
 from domain.User import User
-import json
+from psycopg2 import ProgrammingError, DatabaseError
 
 class UserRepository:
     def __init__(self, connection):
         self.dbConnectionPool = connection
 
-    def loadOne(self, data):
+    def loadOne(self, _id):
         connection = self.dbConnectionPool.getconn()
         cur = connection.cursor()
         cur.execute("""Select id, name, password, access from USERS WHERE id = %(id)s""",
-                    data)
+                    _id)
         user = cur.fetchone()
+
+        cur.close()
+        self.dbConnectionPool.putconn(connection)
 
         if user:
             return User(user[1], user[2], user[3], user[0]).__dict__
@@ -22,8 +25,10 @@ class UserRepository:
         cur = connection.cursor()
         cur.execute("""Select id, name, password, access from USERS""")
         users = cur.fetchall()
-        cur.close()
         usersList = []
+
+        cur.close()
+        self.dbConnectionPool.putconn(connection)
 
         for item in users:
             usersList.append(User(item[1], item[2], item[3], item[0]).__dict__)
@@ -33,33 +38,49 @@ class UserRepository:
     def save(self, data):
         connection = self.dbConnectionPool.getconn()
         cur = connection.cursor()
-        cur.execute("""INSERT INTO USERS (name, password, access) VALUES (%(name)s, %(password)s, %(access)s)""",
-                    data)
-        cur.close()
-        connection.commit()
 
-    def delete(self, data):
+        try:
+            cur.execute("""INSERT INTO USERS (name, password, access) VALUES (%(name)s, %(password)s, %(access)s)""",
+                        data)
+        except (Exception, DatabaseError) as error:
+            cur.close()
+            self.dbConnectionPool.putconn(connection)
+            return None
+
+        else:
+            connection.commit()
+            cur.close()
+            self.dbConnectionPool.putconn(connection)
+            return data
+
+    def delete(self, _id):
         connection = self.dbConnectionPool.getconn()
         cur = connection.cursor()
-        cur.execute("""with a as (DELETE FROM USERS WHERE id = %(id)s returning 1)
-                                select count(*) from a""", data)
-        count = cur.fetchone()
-        cur.close()
+        cur.execute("""DELETE FROM USERS WHERE id = %(id)s """, _id)
+        count = cur.rowcount
+
         connection.commit()
-        if count[0] == 1:
-            return {"User Deleted.": data}
+
+        cur.close()
+        self.dbConnectionPool.putconn(connection)
+
+        if count == 1:
+            return {"User Deleted.": _id}
         else:
             return None
 
     def update(self, data):
         connection = self.dbConnectionPool.getconn()
         cur = connection.cursor()
-        cur.execute("""with a as (UPDATE USERS SET name = %(name)s, password = %(password)s, access = %(access)s 
-                        WHERE id = %(id)s returning 1) select count(*) from a""", data)
+        cur.execute("""UPDATE USERS SET name = %(name)s, password = %(password)s, access = %(access)s 
+                        WHERE id = %(id)s""", data)
         connection.commit()
-        count = cur.fetchone()
+        count = cur.rowcount
 
-        if count[0] == 1:
+        cur.close()
+        self.dbConnectionPool.putconn(connection)
+
+        if count == 1:
             return data
         else:
             return None

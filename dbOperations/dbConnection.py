@@ -2,7 +2,7 @@ import psycopg2
 from psycopg2 import pool
 
 
-def connect():
+def connectionPool():
     try:
         conn = psycopg2.pool.SimpleConnectionPool(2, 50, user="postgres",
                                                   password="mysecretpassword",

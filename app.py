@@ -1,15 +1,14 @@
 from flask import Flask, jsonify, request, abort
 from services import UserService, PlayerService
 from repositories import UserRepository, PlayerRepository
-from dbOperations.dbConnection import connect
+from dbOperations import dbConnection
 
+dbConnectionPool = dbConnection.connectionPool()
 
-dbConnection = connect()
-
-userRepository = UserRepository.UserRepository(dbConnection)
+userRepository = UserRepository.UserRepository(dbConnectionPool)
 userService = UserService.UserService(userRepository)
 
-playerRepository = PlayerRepository.PlayerRepository(dbConnection)
+playerRepository = PlayerRepository.PlayerRepository(dbConnectionPool)
 playerService = PlayerService.PlayerService(playerRepository)
 
 
@@ -20,8 +19,13 @@ app = Flask(__name__)
 def userEndpoint():
 
     if request.method == 'POST':
-        userService.addUser(request.json)
-        return request.json
+        answer = userService.addUser(request.json)
+
+        if answer is None:
+            return abort(404)
+        else:
+            return jsonify(answer)
+
 
     elif request.method == 'GET':
         return jsonify(userService.getAllUsers())
@@ -95,3 +99,5 @@ def playerByIdEndpoint(_id):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+dbConnectionPool.closeall()
