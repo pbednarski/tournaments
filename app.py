@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, abort
-from services import UserService, PlayerService
-from repositories import UserRepository, PlayerRepository
+from services import UserService, PlayerService, TournamentService
+from repositories import UserRepository, PlayerRepository, TournamentRepository
 from dbOperations import dbConnection
 
 dbConnectionPool = dbConnection.connectionPool()
@@ -11,13 +11,14 @@ userService = UserService.UserService(userRepository)
 playerRepository = PlayerRepository.PlayerRepository(dbConnectionPool)
 playerService = PlayerService.PlayerService(playerRepository)
 
+tournamentRepository = TournamentRepository.TournamentRepository(dbConnectionPool)
+tournamentService = TournamentService.TournamentService(tournamentRepository)
 
 app = Flask(__name__)
 
 
 @app.route('/user/', methods=['POST', 'GET'])
 def userEndpoint():
-
     if request.method == 'POST':
         answer = userService.addUser(request.json)
 
@@ -95,6 +96,27 @@ def playerByIdEndpoint(_id):
             return abort(404)
         else:
             return answer
+
+
+@app.route('/tournament/', methods=['POST', 'GET'])
+def tournamentEndpoint():
+    if request.method == 'POST':
+        tournamentService.addTournament(request.json)
+        return request.json
+
+    elif request.method == 'GET':
+        return jsonify(tournamentService.getAllTournaments())
+
+
+@app.route('/tournament/<int:_id>', methods=['GET', 'DELETE', 'PUT'])
+def tournamentByIdEndpoint(_id):
+    if request.method == 'GET':
+        answer = tournamentService.getTournament({"id": _id})
+
+        if answer is None:
+            return abort(404)
+        else:
+            return jsonify(answer)
 
 
 if __name__ == '__main__':

@@ -1,12 +1,9 @@
 
 class Tournament:
-  def __init__(self, name, tournamenttype, datetime):
-    self.Id = None
-    self.Name = name
-    self.Type = tournamenttype
-    self.Date = datetime
-    self.PlayersList = []
-    self.Access = []
-
-
-
+    def __init__(self, name, _type, datetime, players, access, _id=None):
+        self.Id = _id
+        self.Name = name
+        self.Type = _type
+        self.Date = datetime
+        self.PlayersList = players
+        self.Access = access

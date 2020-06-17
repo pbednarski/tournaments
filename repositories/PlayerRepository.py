@@ -4,11 +4,11 @@ class PlayerRepository:
     def __init__(self, connection):
         self.dbConnectionPool = connection
 
-    def loadOne(self, data):
+    def loadOne(self, _id):
         connection = self.dbConnectionPool.getconn()
         cur = connection.cursor()
         cur.execute("""Select id, name, lastname from PLAYERS WHERE id = %(id)s""",
-                    data)
+                    _id)
         player = cur.fetchone()
 
         self.dbConnectionPool.putconn(connection)
@@ -44,10 +44,10 @@ class PlayerRepository:
 
         self.dbConnectionPool.putconn(connection)
 
-    def delete(self, data):
+    def delete(self, _id):
         connection = self.dbConnectionPool.getconn()
         cur = connection.cursor()
-        cur.execute("""DELETE FROM PLAYERS WHERE id = %(id)s""", data)
+        cur.execute("""DELETE FROM PLAYERS WHERE id = %(id)s""", _id)
         count = cur.rowcount
         connection.commit()
 
@@ -55,22 +55,22 @@ class PlayerRepository:
         self.dbConnectionPool.putconn(connection)
 
         if count == 1:
-            return {"Player Deleted.": data}
+            return {"Player Deleted.": _id}
         else:
             return None
 
-    def update(self, data):
+    def update(self, _id):
         connection = self.dbConnectionPool.getconn()
         cur = connection.cursor()
         cur.execute("""UPDATE PLAYERS SET name = %(name)s, lastname = %(lastname)s 
-                        WHERE id = %(id)s""", data)
+                        WHERE id = %(id)s""", _id)
         connection.commit()
         count = cur.rowcount
 
         self.dbConnectionPool.putconn(connection)
 
         if count == 1:
-            return data
+            return _id
         else:
             return None
 

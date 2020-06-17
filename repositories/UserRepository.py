@@ -72,15 +72,17 @@ class UserRepository:
     def update(self, data):
         connection = self.dbConnectionPool.getconn()
         cur = connection.cursor()
-        cur.execute("""UPDATE USERS SET name = %(name)s, password = %(password)s, access = %(access)s 
-                        WHERE id = %(id)s""", data)
-        connection.commit()
-        count = cur.rowcount
+        try:
+            cur.execute("""UPDATE USERS SET name = %(name)s, password = %(password)s, access = %(access)s 
+                            WHERE id = %(id)s""", data)
 
-        cur.close()
-        self.dbConnectionPool.putconn(connection)
-
-        if count == 1:
-            return data
-        else:
+        except (Exception, DatabaseError) as error:
+            cur.close()
+            self.dbConnectionPool.putconn(connection)
             return None
+
+        else:
+            connection.commit()
+            cur.close()
+            self.dbConnectionPool.putconn(connection)
+            return data
