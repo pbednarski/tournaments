@@ -15,6 +15,7 @@ playerService = PlayerService.PlayerService(playerRepository)
 tournamentRepository = TournamentRepository.TournamentRepository(dbConnectionPool)
 tournamentService = TournamentService.TournamentService(tournamentRepository)
 
+
 app = Flask(__name__)
 
 port = int(os.environ.get("PORT", 5000))
@@ -136,29 +137,51 @@ def tournamentEndpoint():
 @app.route('/tournament/<int:_id>', methods=['GET', 'DELETE', 'PUT'])
 def tournamentByIdEndpoint(_id):
     if request.method == 'GET':
-        answer = tournamentService.getTournament({"id": _id})
+        _answer = tournamentService.getTournament({"id": _id})
 
-        if answer is None:
+        if _answer is None:
             return abort(404)
         else:
-            return jsonify(answer)
+            return jsonify(_answer)
 
     elif request.method == 'DELETE':
-        answer = tournamentService.deleteTournament({"id": _id})
+        _answer = tournamentService.deleteTournament({"id": _id})
 
-        if answer is None:
+        if _answer is None:
             return abort(404)
         else:
-            return answer
+            return jsonify(_answer)
 
     elif request.method == 'PUT':
         data = dict({"id": _id}, **request.json)
-        answer = tournamentService.updateTournamen(data)
+        _answer = tournamentService.updateTournamen(data)
 
-        if answer is None:
+        if _answer is None:
             return abort(404)
         else:
-            return answer
+            return jsonify(_answer)
+
+
+@app.route('/login/', methods=['POST'])
+def loginEndpoint():
+    if request.method == 'POST':
+        token = userService.loginUser(request.json)
+
+        if token is None:
+            return abort(404)
+        else:
+            return jsonify(token)
+
+
+@app.route('/logout/', methods=['GET'])
+def logoutEndpoint():
+    if request.method == 'GET':
+        _answer = userService.logoutUser({"uuid": request.headers.get('uuid')})
+
+        if _answer is None:
+            return abort(404)
+        else:
+            return jsonify(_answer)
 
 
 if __name__ == '__main__':

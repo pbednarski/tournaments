@@ -24,5 +24,13 @@ class UserService:
         userEntity = self.userRepository.update(data)
         return userEntity
 
+    def loginUser(self, data):
+        _uuid = self.userRepository.loginUser(data)
+        return _uuid
+
+    def logoutUser(self, data):
+        message = self.userRepository.logoutUser(data)
+        return message
+
 
 

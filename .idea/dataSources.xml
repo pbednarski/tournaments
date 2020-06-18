@@ -7,5 +7,11 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="heroku" uuid="cc328fd9-9c2e-432f-b81a-0623bdd5e4c0">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://ec2-54-246-87-132.eu-west-1.compute.amazonaws.com:5432/d1rl8rvnmmnef1</jdbc-url>
+    </data-source>
   </component>
 </project>
