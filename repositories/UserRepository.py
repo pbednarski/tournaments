@@ -1,7 +1,9 @@
 from domain.User import User
 from psycopg2 import ProgrammingError, DatabaseError
+from datetime import datetime
 import logging
 import uuid
+
 
 class UserRepository:
     def __init__(self, connection):
@@ -136,14 +138,23 @@ class UserRepository:
         else:
             if user:
                 _uuid = str(uuid.uuid4())
-                _newdata = dict({"uuid": _uuid}, **self.__generateUserObject(user))
+                _newdata = {"uuid": _uuid, "id": user[0]}
 
-                cur.execute(
-                    """INSERT INTO USERLOGGED (uuid, created, expired, userid) VALUES (%(uuid)s, now(), 
-                    now() + '30 minute'::interval, %(Id)s) RETURNING *""", _newdata)
-                connection.commit()
+                try:
+                    cur.execute(
+                        """INSERT INTO USERLOGGED (uuid, created, expired, userid) VALUES (%(uuid)s, now(), 
+                        now() + '30 minute'::interval, %(id)s) RETURNING *""", _newdata)
+                    connection.commit()
 
-                return _uuid
+                except DatabaseError:
+                    self.__closeConnection(cur, connection)
+
+                    return {"User Already Logged in": ""}
+
+                else:
+                    self.__closeConnection(cur, connection)
+
+                    return _uuid
 
     def logoutUser(self, data):
         connection = self.dbConnectionPool.getconn()
@@ -156,7 +167,7 @@ class UserRepository:
         except DatabaseError:
             self.__closeConnection(cur, connection)
 
-            return None
+            return {"User not Logged in": ""}
 
         else:
             user = cur.fetchone()
@@ -164,3 +175,38 @@ class UserRepository:
 
             if user:
                 return {"user logged Out": data}
+
+    def isLoggedIn(self, data):
+        connection = self.dbConnectionPool.getconn()
+        cur = connection.cursor()
+
+        try:
+            cur.execute("""Delete FROM userlogged where expired < now()""")
+            connection.commit()
+
+        except DatabaseError:
+            self.__closeConnection(cur, connection)
+
+            return None
+
+        else:
+
+            try:
+                cur.execute("""SELECT id, uuid, created, expired, userid FROM userlogged where uuid = %(uuid)s""", data)
+                loggedUser = cur.fetchone()
+            except DatabaseError:
+                self.__closeConnection(cur, connection)
+
+                return None
+
+            else:
+                if loggedUser:
+                    user = self.loadOne({"id": loggedUser[4]})
+
+                    self.__closeConnection(cur, connection)
+
+                    return user
+                else:
+                    self.__closeConnection(cur, connection)
+
+                    return None

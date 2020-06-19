@@ -16,12 +16,32 @@ tournamentRepository = TournamentRepository.TournamentRepository(dbConnectionPoo
 tournamentService = TournamentService.TournamentService(tournamentRepository)
 
 
+def isLoggedIn(function):
+    def check(*args, **kwargs):
+        if request.headers.get('uuid'):
+            uuid = {"uuid": request.headers.get('uuid')}
+
+            _answer = userService.isLoggedIn(uuid)
+
+            if _answer is None:
+                return jsonify({"result": "You need to login to call that method"})
+            else:
+                return function(*args, **kwargs)
+
+        else:
+            return jsonify({"result": "You need to add token to request"})
+
+    check.__name__ = function.__name__
+    return check
+
+
 app = Flask(__name__)
 
 port = int(os.environ.get("PORT", 5000))
 
 
 @app.route('/user/', methods=['POST', 'GET'])
+@isLoggedIn
 def userEndpoint():
     if request.method == 'POST':
         _answer = userService.addUser(request.json)
@@ -40,8 +60,10 @@ def userEndpoint():
             return jsonify(_answer)
 
 
-@app.route('/user/<int:_id>', methods=['GET', 'DELETE', 'PUT'])
+@app.route('/user/<int:_id>', methods=['GET', 'DELETE', 'PUT', 'POST'])
+@isLoggedIn
 def userByIdEndpoint(_id):
+
     if request.method == 'GET':
         _answer = userService.getUser({"id": _id})
 
@@ -69,6 +91,7 @@ def userByIdEndpoint(_id):
 
 
 @app.route('/player/', methods=['POST', 'GET'])
+@isLoggedIn
 def playerEndpoint():
     if request.method == 'POST':
         _answer = playerService.addPlayer(request.json)
@@ -88,6 +111,7 @@ def playerEndpoint():
 
 
 @app.route('/player/<int:_id>', methods=['GET', 'DELETE', 'PUT'])
+@isLoggedIn
 def playerByIdEndpoint(_id):
     if request.method == 'GET':
         _answer = playerService.getPlayer({"id": _id})
@@ -116,6 +140,7 @@ def playerByIdEndpoint(_id):
 
 
 @app.route('/tournament/', methods=['POST', 'GET'])
+@isLoggedIn
 def tournamentEndpoint():
     if request.method == 'POST':
         _answer = tournamentService.addTournament(request.json)
@@ -135,6 +160,7 @@ def tournamentEndpoint():
 
 
 @app.route('/tournament/<int:_id>', methods=['GET', 'DELETE', 'PUT'])
+@isLoggedIn
 def tournamentByIdEndpoint(_id):
     if request.method == 'GET':
         _answer = tournamentService.getTournament({"id": _id})
@@ -182,6 +208,24 @@ def logoutEndpoint():
             return abort(404)
         else:
             return jsonify(_answer)
+
+
+@app.route('/loggedin/', methods=['GET'])
+def whoIsLoggedIn():
+    if request.method == 'GET':
+
+        if request.headers.get('uuid'):
+            uuid = {"uuid": request.headers.get('uuid')}
+
+            _answer = userService.isLoggedIn(uuid)
+
+            if _answer is None:
+                return abort(404)
+            else:
+                return jsonify(_answer)
+
+        else:
+            return jsonify({"You need to add token to request": ""})
 
 
 if __name__ == '__main__':

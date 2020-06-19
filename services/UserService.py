@@ -32,5 +32,6 @@ class UserService:
         message = self.userRepository.logoutUser(data)
         return message
 
-
-
+    def isLoggedIn(self, data):
+        userEntity = self.userRepository.isLoggedIn(data)
+        return userEntity
