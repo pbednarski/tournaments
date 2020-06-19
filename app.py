@@ -21,12 +21,12 @@ def isLoggedIn(function):
         if request.headers.get('uuid'):
             uuid = {"uuid": request.headers.get('uuid')}
 
-            _answer = userService.isLoggedIn(uuid)
+            loggedUser = userService.isLoggedIn(uuid)
 
-            if _answer is None:
+            if loggedUser is None:
                 return jsonify({"result": "You need to login to call that method"})
             else:
-                return function(*args, **kwargs)
+                return function(loggedUser, *args, **kwargs)
 
         else:
             return jsonify({"result": "You need to add token to request"})
@@ -42,7 +42,7 @@ port = int(os.environ.get("PORT", 5000))
 
 @app.route('/user/', methods=['POST', 'GET'])
 @isLoggedIn
-def userEndpoint():
+def userEndpoint(user):
     if request.method == 'POST':
         _answer = userService.addUser(request.json)
 
@@ -52,7 +52,7 @@ def userEndpoint():
             return jsonify(_answer)
 
     elif request.method == 'GET':
-        _answer = userService.getAllUsers()
+        _answer = userService.getAllUsers(user)
 
         if _answer is None:
             return abort(404)
@@ -70,7 +70,7 @@ def userByIdEndpoint(_id):
         if _answer is None:
             return abort(404)
         else:
-            return jsonify(_answer)
+            return jsonify(_answer.__dict__)
 
     elif request.method == 'DELETE':
         _answer = userService.deleteUser({"id": _id})
@@ -222,7 +222,7 @@ def whoIsLoggedIn():
             if _answer is None:
                 return abort(404)
             else:
-                return jsonify(_answer)
+                return jsonify(_answer.__dict__)
 
         else:
             return jsonify({"You need to add token to request": ""})
@@ -230,5 +230,3 @@ def whoIsLoggedIn():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=port, debug=True)
-
-dbConnectionPool.closeall()

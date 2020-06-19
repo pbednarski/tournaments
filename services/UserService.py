@@ -8,8 +8,8 @@ class UserService:
         userEntity = self.userRepository.loadOne(_id)
         return userEntity
 
-    def getAllUsers(self):
-        usersList = self.userRepository.loadAll()
+    def getAllUsers(self, user):
+        usersList = self.userRepository.loadAll(user)
         return usersList
 
     def addUser(self, data):

@@ -15,7 +15,7 @@ class UserRepository:
 
     def __generateUserObject(self, user):
         if user:
-            return User(user[1], user[2], user[3], user[4], user[5], user[0]).__dict__
+            return User(user[1], user[2], user[3], user[4], user[5], user[0])
         else:
             return None
 
@@ -38,28 +38,35 @@ class UserRepository:
 
             return self.__generateUserObject(user)
 
-    def loadAll(self):
-        connection = self.dbConnectionPool.getconn()
-        cur = connection.cursor()
+    def loadAll(self, user):
 
-        try:
-            cur.execute("""Select id, name, email, dateofbirth, password, access from USERS""")
+        if user.Access == "1":
 
-        except DatabaseError:
-            self.__closeConnection(cur, connection)
+            connection = self.dbConnectionPool.getconn()
+            cur = connection.cursor()
 
-            return None
+            try:
+                cur.execute("""Select id, name, email, dateofbirth, password, access from USERS""")
+
+            except DatabaseError:
+                self.__closeConnection(cur, connection)
+
+                return None
+
+            else:
+                users = cur.fetchall()
+                usersList = []
+
+                self.__closeConnection(cur, connection)
+
+                for item in users:
+                    usersList.append(User(item[1], item[2], item[3], item[4], item[5], item[0]).__dict__)
+
+                return usersList
 
         else:
-            users = cur.fetchall()
-            usersList = []
 
-            self.__closeConnection(cur, connection)
-
-            for item in users:
-                usersList.append(User(item[1], item[2], item[3], item[4], item[5], item[0]).__dict__)
-
-            return usersList
+            return {"result": "You are not allowed to get users list"}
 
     def save(self, data):
         connection = self.dbConnectionPool.getconn()
@@ -194,6 +201,7 @@ class UserRepository:
             try:
                 cur.execute("""SELECT id, uuid, created, expired, userid FROM userlogged where uuid = %(uuid)s""", data)
                 loggedUser = cur.fetchone()
+
             except DatabaseError:
                 self.__closeConnection(cur, connection)
 
