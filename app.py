@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, abort
+from domain import User
 from services import UserService, PlayerService, TournamentService
 from repositories import UserRepository, PlayerRepository, TournamentRepository
 from dbOperations import dbConnection
@@ -18,15 +19,15 @@ tournamentService = TournamentService.TournamentService(tournamentRepository)
 
 def isLoggedIn(function):
     def check(*args, **kwargs):
-        if request.headers.get('uuid'):
-            uuid = {"uuid": request.headers.get('uuid')}
+        uuid = {"uuid": request.headers.get('uuid')}
+        if uuid:
 
             loggedUser = userService.isLoggedIn(uuid)
 
-            if loggedUser is None:
-                return jsonify({"result": "You need to login to call that method"})
-            else:
+            if isinstance(loggedUser, User.User):
                 return function(loggedUser, *args, **kwargs)
+            else:
+                return jsonify({"result": "Your Session Expired. Login to proceed."})
 
         else:
             return jsonify({"result": "You need to add token to request"})
@@ -44,7 +45,7 @@ port = int(os.environ.get("PORT", 5000))
 @isLoggedIn
 def userEndpoint(user):
     if request.method == 'POST':
-        _answer = userService.addUser(request.json)
+        _answer = userService.addUser(user, request.json)
 
         if _answer is None:
             return abort(404)
@@ -60,34 +61,32 @@ def userEndpoint(user):
             return jsonify(_answer)
 
 
-@app.route('/user/<int:_id>', methods=['GET', 'DELETE', 'PUT', 'POST'])
+@app.route('/user/<int:_id>', methods=['GET', 'DELETE', 'PUT'])
 @isLoggedIn
-def userByIdEndpoint(_id):
-
+def userByIdEndpoint(user, _id):
     if request.method == 'GET':
-        _answer = userService.getUser({"id": _id})
+        _answer = userService.getUser(user, _id)
 
         if _answer is None:
             return abort(404)
         else:
-            return jsonify(_answer.__dict__)
+            return jsonify(_answer)
 
     elif request.method == 'DELETE':
-        _answer = userService.deleteUser({"id": _id})
+        _answer = userService.deleteUser(user, {"id": _id})
 
         if _answer is None:
             return abort(404)
         else:
-            return _answer
+            return jsonify(_answer)
 
     elif request.method == 'PUT':
-        data = dict({"id": _id}, **request.json)
-        _answer = userService.updateUser(data)
+        _answer = userService.updateUser(user, dict({"id": _id}, **request.json))
 
         if _answer is None:
             return abort(404)
         else:
-            return _answer
+            return jsonify(_answer)
 
 
 @app.route('/player/', methods=['POST', 'GET'])

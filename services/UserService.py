@@ -4,24 +4,24 @@ class UserService:
     def __init__(self, userRepository):
         self.userRepository = userRepository
 
-    def getUser(self, _id):
-        userEntity = self.userRepository.loadOne(_id)
+    def getUser(self, user, _id):
+        userEntity = self.userRepository.loadOne(user, _id)
         return userEntity
 
     def getAllUsers(self, user):
         usersList = self.userRepository.loadAll(user)
         return usersList
 
-    def addUser(self, data):
-        userEntity = self.userRepository.save(data)
+    def addUser(self, user, data):
+        userEntity = self.userRepository.save(user, data)
         return userEntity
 
-    def deleteUser(self, _id):
-        userEntity = self.userRepository.delete(_id)
+    def deleteUser(self, user, _id):
+        userEntity = self.userRepository.delete(user, _id)
         return userEntity
 
-    def updateUser(self, data):
-        userEntity = self.userRepository.update(data)
+    def updateUser(self, user, data):
+        userEntity = self.userRepository.update(user, data)
         return userEntity
 
     def loginUser(self, data):
