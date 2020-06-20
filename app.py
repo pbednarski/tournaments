@@ -19,10 +19,10 @@ tournamentService = TournamentService.TournamentService(tournamentRepository)
 
 def isLoggedIn(function):
     def check(*args, **kwargs):
-        uuid = {"uuid": request.headers.get('uuid')}
+        uuid = request.headers.get('uuid')
         if uuid:
 
-            loggedUser = userService.isLoggedIn(uuid)
+            loggedUser = userService.isLoggedIn({"uuid": request.headers.get('uuid')})
 
             if isinstance(loggedUser, User.User):
                 return function(loggedUser, *args, **kwargs)
@@ -30,7 +30,7 @@ def isLoggedIn(function):
                 return jsonify({"result": "Your Session Expired. Login to proceed."})
 
         else:
-            return jsonify({"result": "You need to add token to request"})
+            return function(User.User(None, None, None, None, 0, ), *args, **kwargs)
 
     check.__name__ = function.__name__
     return check
