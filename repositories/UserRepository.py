@@ -113,7 +113,7 @@ class UserRepository:
                 try:
                     cur.execute(
                         """INSERT INTO USERLOGGED (uuid, created, expired, userid) VALUES (%(uuid)s, now(), 
-                        now() + '30 minute'::interval, %(id)s) RETURNING *""", {"uuid": _uuid, "id": user[0]})
+                        now() + '90 minute'::interval, %(id)s) RETURNING *""", {"uuid": _uuid, "id": user[0]})
                     connection.commit()
                 except DatabaseError:
                     cur.close()

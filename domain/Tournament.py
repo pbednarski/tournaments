@@ -1,9 +1,11 @@
 
 class Tournament:
-    def __init__(self, name, _type, datetime, players, access, _id=None):
+    def __init__(self, name, datetime, maxplayers, players, createdby, challengeladder, isactive=False, _id=None):
         self.Id = _id
         self.Name = name
-        self.Type = _type
-        self.Date = datetime
+        self.StartingDate = datetime
+        self.MaxPlayers = maxplayers
         self.PlayersList = players
-        self.Access = access
+        self.CreatedBy = createdby
+        self.ChallengeLadder = challengeladder
+        self.IsActive = isactive

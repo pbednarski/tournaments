@@ -2,22 +2,22 @@ class TournamentService:
     def __init__(self, tournamentRepository):
         self.tournamentRepository = tournamentRepository
 
-    def getTournament(self, _id):
-        tournamentEntity = self.tournamentRepository.loadOne(_id)
+    def getTournament(self, user, _id):
+        tournamentEntity = self.tournamentRepository.loadOne(user, _id)
         return tournamentEntity
 
-    def getAllTournaments(self):
-        tournamentsList = self.tournamentRepository.loadAll()
+    def getAllTournaments(self, user):
+        tournamentsList = self.tournamentRepository.loadAll(user)
         return tournamentsList
 
-    def addTournament(self, data):
-        tournamentEntity = self.tournamentRepository.save(data)
+    def addTournament(self, user, data):
+        tournamentEntity = self.tournamentRepository.save(user, data)
         return tournamentEntity
 
-    def deleteTournament(self, _id):
-        tournamentEntity = self.tournamentRepository.delete(_id)
+    def deleteTournament(self, user, _id):
+        tournamentEntity = self.tournamentRepository.delete(user, _id)
         return tournamentEntity
 
-    def updateTournamen(self, data):
-        tournamentEntity = self.tournamentRepository.update(data)
+    def updateTournamen(self, user, data):
+        tournamentEntity = self.tournamentRepository.update(user, data)
         return tournamentEntity
