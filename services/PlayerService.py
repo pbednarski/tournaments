@@ -2,22 +2,22 @@ class PlayerService:
     def __init__(self, playerRepository):
         self.userRepository = playerRepository
 
-    def getPlayer(self, _id):
-        userEntity = self.userRepository.loadOne(_id)
+    def getPlayer(self, user, _id):
+        userEntity = self.userRepository.loadOne(user, _id)
         return userEntity
 
-    def getAllPlayers(self):
-        usersList = self.userRepository.loadAll()
+    def getAllPlayers(self, user):
+        usersList = self.userRepository.loadAll(user)
         return usersList
 
-    def addPlayer(self, data):
-        userEntity = self.userRepository.save(data)
+    def addPlayer(self, user, data):
+        userEntity = self.userRepository.save(user, data)
         return userEntity
 
-    def deletePlayer(self, _id):
-        userEntity = self.userRepository.delete(_id)
+    def deletePlayer(self, user, _id):
+        userEntity = self.userRepository.delete(user, _id)
         return userEntity
 
-    def updatePlayer(self, data):
-        userEntity = self.userRepository.update(data)
+    def updatePlayer(self, user, data):
+        userEntity = self.userRepository.update(user, data)
         return userEntity

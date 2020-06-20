@@ -76,7 +76,10 @@ class UserRepository:
             return {"result": "Database Execute Error"}
         else:
             user = cur.fetchone()
-            return self.__generateUserObject(user).__dict__
+            if user:
+                return self.__generateUserObject(user).__dict__
+            else:
+                return {"result": "Database Execute Error"}
 
     @adminCheck
     def update(self, _user, cur, connection, data):

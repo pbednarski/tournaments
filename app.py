@@ -91,9 +91,9 @@ def userByIdEndpoint(user, _id):
 
 @app.route('/player/', methods=['POST', 'GET'])
 @isLoggedIn
-def playerEndpoint():
+def playerEndpoint(user):
     if request.method == 'POST':
-        _answer = playerService.addPlayer(request.json)
+        _answer = playerService.addPlayer(user, request.json)
 
         if _answer is None:
             return abort(404)
@@ -101,7 +101,7 @@ def playerEndpoint():
             return jsonify(_answer)
 
     elif request.method == 'GET':
-        _answer = playerService.getAllPlayers()
+        _answer = playerService.getAllPlayers(user)
 
         if _answer is None:
             return abort(404)
@@ -111,9 +111,9 @@ def playerEndpoint():
 
 @app.route('/player/<int:_id>', methods=['GET', 'DELETE', 'PUT'])
 @isLoggedIn
-def playerByIdEndpoint(_id):
+def playerByIdEndpoint(user, _id):
     if request.method == 'GET':
-        _answer = playerService.getPlayer({"id": _id})
+        _answer = playerService.getPlayer(user, {"id": _id})
 
         if _answer is None:
             return abort(404)
@@ -121,7 +121,7 @@ def playerByIdEndpoint(_id):
             return jsonify(_answer)
 
     elif request.method == 'DELETE':
-        _answer = playerService.deletePlayer({"id": _id})
+        _answer = playerService.deletePlayer(user, {"id": _id})
 
         if _answer is None:
             return abort(404)
@@ -130,7 +130,7 @@ def playerByIdEndpoint(_id):
 
     elif request.method == 'PUT':
         data = dict({"id": _id}, **request.json)
-        _answer = playerService.updatePlayer(data)
+        _answer = playerService.updatePlayer(user, data)
 
         if _answer is None:
             return abort(404)
