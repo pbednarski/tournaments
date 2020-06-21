@@ -9,8 +9,11 @@ def adminCheck(function):
     def check(self, _user, *args, **kwargs):
         connection = self.dbConnectionPool.getconn()
         cur = connection.cursor()
-        if _user.Access == "1":
-            result = function(self, _user, cur, connection, *args, **kwargs)
+        if _user:
+            if _user.Access == "1":
+                result = function(self, _user, cur, connection, *args, **kwargs)
+            else:
+                result = {"result": "you do not have permissions to proceed."}
         else:
             result = {"result": "you do not have permissions to proceed."}
         cur.close()
@@ -39,7 +42,10 @@ class UserRepository:
             return {"result": "Database Execute Error"}
         else:
             user = cur.fetchone()
-            return self.__generateUserObject(user).__dict__
+            if user:
+                return self.__generateUserObject(user).__dict__
+            else:
+                return {"result": "user doesn't exist"}
 
     @adminCheck
     def loadAll(self, user, cur, connection):

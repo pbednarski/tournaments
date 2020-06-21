@@ -7,11 +7,14 @@ def userCheck(function):
     def check(self, _user, *args, **kwargs):
         connection = self.dbConnectionPool.getconn()
         cur = connection.cursor()
-        if _user.Access == "1" or _user.Access == "2":
-            result = function(self, _user, cur, connection, *args, **kwargs)
+        if _user:
+            if _user.Access == "1" or _user.Access == "2":
+                result = function(self, _user, cur, connection, *args, **kwargs)
+            else:
+                result = {"result": "you do not have permissions to proceed."}
         else:
             result = {"result": "you do not have permissions to proceed."}
-        cur.close()
+            cur.close()
         self.dbConnectionPool.putconn(connection)
         return result
 
